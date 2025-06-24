@@ -1,0 +1,97 @@
+Act as an expert software developer. Your task is to iteratively improve the provided codebase. The quality of each candidate program is measured by an external evaluator script, which returns one or more scalar metrics. Higher values are always better. Before proposing code edits, briefly explain--in 2-4 sentences--what you intend to change and why it will improve the program. After that explanation, output one or more SEARCH/REPLACE diff blocks exactly as specified below.
+
+- Current program
+
+Here is the current program we are trying to improve (you will
+need to propose a modification to it below).
+
+mae: 61.111
+
+```
+# EVOLVE-BLOCK START
+import numpy as np
+from datasets import Dataset, load_from_disk
+# EVOLVE-BLOCK END
+
+def predict_concentrations(potential_sequence: list[float], current_sequence: list[float]) -> int:
+    """
+    Predicts unknown concentration of Fc in dpvs.
+    """
+# EVOLVE-BLOCK START
+    # Calculate the average and standard deviation of the current sequence
+    avg_current = np.mean(current_sequence)
+    
+    std_current = np.std(current_sequence)
+
+    # Calculate the maximum and minimum values of the current sequence
+    max_current = np.max(current_sequence)
+    min_current = np.min(current_sequence)
+
+    # Calculate the peak position and width
+    peak_position = potential_sequence[np.argmax(current_sequence)]
+    threshold = 0.8 * max_current
+    peak_indices = np.where(current_sequence > threshold)[0]
+    peak_width = potential_sequence[peak_indices[-1]] - potential_sequence[peak_indices[0]] if peak_indices.size > 0 else 0
+
+    # Define thresholds for different concentrations based on peak characteristics
+    if peak_position > 0.3:
+        return 0
+    elif avg_current < 1.0 or std_current < 0.2 or max_current < 1.5:
+        return 100
+    else:
+        return 200
+# EVOLVE-BLOCK END
+```
+
+SEARCH/REPLACE block rules:
+Use the diff sentinels exactly as shown below (note that the comment lines are placeholders--you must replace them with the actual lines to delete and the new lines to insert). If you include the placeholders comments in your response, it will be ignored. Anything outside the search and replace markers will be ignored.
+
+<<<<<<< SEARCH
+# lines from the current program to locate
+=======
+# replacement lines
+>>>>>>> REPLACE
+
+The SEARCH section must match the current program byte-for-byte, including indentation and comments.
+To insert new code, include one blank line on the SEARCH side and write your addition on the REPLACE side.  
+To delete code, put the lines to remove in SEARCH and leave REPLACE empty.
+
+It is critical that the SEARCH section matches byte-for-byte.
+
+The REPLACE section must contain syntactically valid code.  
+If you create a new symbol (function, variable, config), patch every place that references it in the same response.
+Make sure that the changes you propose are consistent with each
+other. For example, if you refer to a new config variable
+somewhere, you should also propose a change to add that
+variable.
+
+Edits are permitted **only** within the regions of the current program that are explicitly tagged between `# EVOLVE-BLOCK START` and `# EVOLVE-BLOCK END`. Do not modify or reference code outside those evolution blocks; any patch that touches other areas will be rejected.
+
+You may output several diff blocks in one response, listed sequentially in the order the changes appear in the file.
+
+Example:
+<<<<<<< SEARCH
+self._block1 = ResNetBlock(num_channels)
+self._block2 = ResNetBlock(num_channels * 2, stride=2)
+self._block3 = ResNetBlock(num_channels * 4, stride=2)
+=======
+self._block1 = ResNetBlock(num_channels)
+self._block2 = ResNetBlock(num_channels, stride=1)
+self._block3 = ResNetBlock(num_channels * 2, stride=2)
+self._block4 = ResNetBlock(num_channels * 2, stride=1)
+self._block5 = ResNetBlock(num_channels * 4, stride=2)
+self._block6 = ResNetBlock(num_channels * 4, stride=1)
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+def optimizer(self, learning_rate):
+    return optax.adam(learning_rate)
+=======
+def optimizer(self, learning_rate):
+    return optax.adamw(learning_rate, weight_decay=1e-4)
+>>>>>>> REPLACE
+
+Task
+I want you to be able to predict the Fc concentration present in unknown. Return your predicted concentration as an int. Note: 100 uM Fc curve peaks will be wider then 200 uM Fc curve peaks.
+Also 0 uM Fc curve peak positions (Potential where peaks occur) will be to the right of the 100 uM Fc and 200 uM Fc peak positions.
+
+Describe each change with a SEARCH/REPLACE block.

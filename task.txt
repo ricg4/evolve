@@ -1,0 +1,2 @@
+I want you to be able to predict the Fc concentration present in unknown. Return your predicted concentration as an int. Note: 100 uM Fc curve peaks will be wider then 200 uM Fc curve peaks.
+Also 0 uM Fc curve peak positions (Potential where peaks occur) will be to the right of the 100 uM Fc and 200 uM Fc peak positions.
